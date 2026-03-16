@@ -5,7 +5,6 @@
 . /bin/ironic-common.sh
 . /bin/auth-common.sh
 
-export HTTP_PORT=${HTTP_PORT:-80}
 export VMEDIA_TLS_PORT=${VMEDIA_TLS_PORT:-8083}
 
 export IRONIC_REVERSE_PROXY_SETUP=${IRONIC_REVERSE_PROXY_SETUP:-false}
@@ -35,8 +34,8 @@ if [[ "$IRONIC_FAST_TRACK" == "true" ]]; then
 fi
 export INSPECTOR_EXTRA_ARGS
 
-# shellcheck disable=SC1091
-. /bin/coreos-ipa-common.sh
+# Detect IPA images by architecture for inspector.ipxe
+detect_ipa_by_arch
 
 # Copy files to shared mount
 render_j2_config /templates/inspector.ipxe.j2 /shared/html/inspector.ipxe
