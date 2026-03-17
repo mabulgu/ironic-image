@@ -5,10 +5,8 @@ WORKDIR /tmp
 
 COPY prepare-efi.sh /bin/
 
-RUN <<EORUN
-set -euxo pipefail
-prepare-efi.sh redhat
-EORUN
+RUN set -euxo pipefail && \
+    prepare-efi.sh redhat
 
 ## Build Python wheels from cachito sources
 FROM registry.ci.openshift.org/ocp/4.22:base-rhel9 AS wheel-builder
@@ -17,21 +15,19 @@ ENV REMOTE_SOURCES=${REMOTE_SOURCES:-"requirements*.cachito"}
 ENV REMOTE_SOURCES_DIR=${REMOTE_SOURCES_DIR:-"/remote_sources_dir/"}
 
 # Install build dependencies
-RUN <<EORUN
-set -euxo pipefail
-echo "install_weak_deps=False" >> /etc/dnf/dnf.conf
-echo "tsflags=nodocs" >> /etc/dnf/dnf.conf
-dnf install -y \
-    python3.12-pip \
-    'python3.12-setuptools >= 70.3.0' \
-    python3.12-setuptools_scm \
-    python3.12-pbr \
-    python3.12-devel \
-    python3.12-wheel \
-    gcc \
-    gcc-c++ \
-    git-core
-EORUN
+RUN set -euxo pipefail && \
+    echo "install_weak_deps=False" >> /etc/dnf/dnf.conf && \
+    echo "tsflags=nodocs" >> /etc/dnf/dnf.conf && \
+    dnf install -y \
+        python3.12-pip \
+        'python3.12-setuptools >= 70.3.0' \
+        python3.12-setuptools_scm \
+        python3.12-pbr \
+        python3.12-devel \
+        python3.12-wheel \
+        gcc \
+        gcc-c++ \
+        git-core
 
 # Copy cachito sources
 COPY "$REMOTE_SOURCES" "$REMOTE_SOURCES_DIR"
@@ -39,10 +35,8 @@ COPY "$REMOTE_SOURCES" "$REMOTE_SOURCES_DIR"
 # Build wheels from cachito requirements
 COPY build-wheels-ocp.sh /bin/
 
-RUN <<EORUN
-set -euxo pipefail
-build-wheels-ocp.sh
-EORUN
+RUN set -euxo pipefail && \
+    build-wheels-ocp.sh
 
 # build final image
 FROM registry.ci.openshift.org/ocp/4.22:base-rhel9
@@ -57,13 +51,12 @@ COPY ironic-config/inspector.ipxe.j2 ironic-config/httpd-ironic-api.conf.j2 \
 COPY prepare-image.sh prepare-ipxe.sh configure-nonroot.sh scripts/*  /bin/
 
 # Install Python packages from pre-built wheels (mounted from wheel-builder stage)
-RUN --mount=from=wheel-builder,source=/wheels,target=/wheels <<EORUN
-set -euxo pipefail
-prepare-image.sh
-rm -f /bin/prepare-image.sh
-/bin/prepare-ipxe.sh
-rm -f /bin/prepare-ipxe.sh
-EORUN
+RUN --mount=from=wheel-builder,source=/wheels,target=/wheels \
+    set -euxo pipefail && \
+    prepare-image.sh && \
+    rm -f /bin/prepare-image.sh && \
+    /bin/prepare-ipxe.sh && \
+    rm -f /bin/prepare-ipxe.sh
 
 # IRONIC #
 COPY --from=builder /tmp/uefi_esp_*.img /tmp/
@@ -78,16 +71,12 @@ COPY ironic-config/apache2-vmedia.conf.j2 /templates/httpd-vmedia.conf.j2
 COPY ironic-config/apache2-proxy.conf.j2 /etc/httpd-proxy.conf.j2
 COPY ironic-config/apache2-ipxe.conf.j2 /templates/httpd-ipxe.conf.j2
 
-RUN <<EORUN
-set -euxo pipefail
-mkdir -p /var/lib/ironic
-sqlite3 /var/lib/ironic/ironic.sqlite "pragma journal_mode=wal"
-dnf remove -y sqlite
-EORUN
+RUN set -euxo pipefail && \
+    mkdir -p /var/lib/ironic && \
+    sqlite3 /var/lib/ironic/ironic.sqlite "pragma journal_mode=wal" && \
+    dnf remove -y sqlite
 
 # configure non-root user and set relevant permissions
-RUN <<EORUN
-set -euxo pipefail
-configure-nonroot.sh
-rm -f /bin/configure-nonroot.sh
-EORUN
+RUN set -euxo pipefail && \
+    configure-nonroot.sh && \
+    rm -f /bin/configure-nonroot.sh
