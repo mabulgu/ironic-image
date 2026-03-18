@@ -83,14 +83,6 @@ dhcp-option=tag:pxe6,tag:!ipxe6,tag:!amd64,tag:!arm64,option6:bootfile-url,tftp:
 dhcp-option=tag:ipxe6,option6:bootfile-url,{{ env.IRONIC_HTTP_URL }}/boot.ipxe
 {% endif %}
 
-# DHCPv6 does not carry router information; routing is handled by
-# Router Advertisements (enable-ra + ra-param above).
-{%- if env["DNS_IP"] is undefined %}
-# Disable DNS over provisioning network
-dhcp-option=option6:dns-server
-{% else %}
-dhcp-option=option6:dns-server,{{ env["DNS_IP"] }}
-{% endif %}
 {% endif %}
 {% endif %}
 
