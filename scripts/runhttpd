@@ -37,6 +37,10 @@ export INSPECTOR_EXTRA_ARGS
 # Detect IPA images by architecture for inspector.ipxe
 detect_ipa_by_arch
 
+# DOWNSTREAM: append CoreOS live rootfs URL to kernel params when rootfs exists
+# shellcheck disable=SC1091
+. /bin/coreos-ipa-common.sh
+
 # Copy files to shared mount
 render_j2_config /templates/inspector.ipxe.j2 /shared/html/inspector.ipxe
 # cp -r /etc/httpd/* "${HTTPD_DIR}"

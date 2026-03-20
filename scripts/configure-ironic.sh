@@ -64,6 +64,10 @@ fi
 # Detect IPA images by architecture
 detect_ipa_by_arch
 
+# DOWNSTREAM: append CoreOS live rootfs URL to kernel params when rootfs exists
+# shellcheck disable=SC1091
+. /bin/coreos-ipa-common.sh
+
 if [[ -f "${IRONIC_CONF_DIR}/ironic.conf" ]]; then
     # Make a copy of the original supposed empty configuration file
     cp "${IRONIC_CONF_DIR}/ironic.conf" "${IRONIC_CONF_DIR}/ironic.conf.orig"
