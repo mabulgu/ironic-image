@@ -5,7 +5,6 @@
 . /bin/ironic-common.sh
 . /bin/auth-common.sh
 
-export HTTP_PORT=${HTTP_PORT:-80}
 export VMEDIA_TLS_PORT=${VMEDIA_TLS_PORT:-8083}
 
 export IRONIC_REVERSE_PROXY_SETUP=${IRONIC_REVERSE_PROXY_SETUP:-false}
@@ -35,6 +34,10 @@ if [[ "$IRONIC_FAST_TRACK" == "true" ]]; then
 fi
 export INSPECTOR_EXTRA_ARGS
 
+# Detect IPA images by architecture for inspector.ipxe
+detect_ipa_by_arch
+
+# DOWNSTREAM: append CoreOS live rootfs URL to kernel params when rootfs exists
 # shellcheck disable=SC1091
 . /bin/coreos-ipa-common.sh
 

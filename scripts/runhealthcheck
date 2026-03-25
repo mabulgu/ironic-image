@@ -1,9 +1,0 @@
-#!/bin/bash
-set -ex
-
-. /bin/ironic-common.sh
-get_ironic_ip
-#If the IP is not set, we are not running yet
-[ -z $IRONIC_IP ] && exit 1
-
-curl -s http://${IRONIC_URL_HOST}:5050

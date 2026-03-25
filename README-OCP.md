@@ -17,5 +17,5 @@ oc registry login
 
 ## Building ironic-image
 
-Once the prerequisites are satisfied, the build can be triggered by running `make` or `podman build .` inside the repo directory.
+Once the prerequisites are satisfied, the build can be triggered by running `make` or `podman build -f Dockerfile.ocp .` inside the repo directory.
 
